@@ -36,11 +36,13 @@ def process_jsonl_to_list(file_name: str, split_list, img_dir, src_folder):
     with open(file_name, 'r') as f1:
         for line in f1:
             json_data = json.loads(line)
-            image_name = json_data['id']
+            image_name = json_data['img']
             sentence = json_data['text']
             label = json_data['label']
-            image_name_in_csv = f"{image_name}.png"
-            shutil.copy(f"{src_folder}/img/{image_name_in_csv}", img_dir)
+            img_name = image_name.split('/')[0]
+            image_name_in_csv = f"{image_name}"
+            # print("json_data = ", json_data)
+            shutil.copy(f"{src_folder}/{image_name_in_csv}", img_dir)
             item = [image_name_in_csv, sentence, label]
             split_list.append(item)
     return
@@ -61,15 +63,15 @@ def preprocess_data(src_folder: str, dest_folder: str, train_split: int = 10000,
     try:
         train_data_file = f"{src_folder}/train.jsonl"
         train_data_list = [['image_name', 'sentence', 'label']]
-        if not os.path.exists("data/training"):
+        if not os.path.exists("./data/training"):
             os.makedirs("data/training")
         process_jsonl_to_list(train_data_file, train_data_list, "data/training", src_folder)
 
         # train data list created
         val_data_file = f"{src_folder}/dev_seen.jsonl"
         validation_data_list = [['image_name', 'sentence', 'label']]
-        if not os.path.exists("data/validation"):
-            os.makedirs("data/validation")
+        if not os.path.exists("./data/validation"):
+            os.makedirs("./data/validation")
         process_jsonl_to_list(val_data_file, validation_data_list, "data/validation", src_folder)
         # validation data list created
 
