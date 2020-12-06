@@ -41,8 +41,10 @@ def process_jsonl_to_list(file_name: str, split_list, img_dir, src_folder):
             label = json_data['label']
             img_name = image_name.split('/')[0]
             image_name_in_csv = f"{image_name}"
-            # print("json_data = ", json_data)
-            shutil.copy(f"{src_folder}/{image_name_in_csv}", img_dir)
+            if label:
+                shutil.copy(f"{src_folder}/{image_name_in_csv}", f"{img_dir}/hateful")
+            else:
+                shutil.copy(f"{src_folder}/{image_name_in_csv}", f"{img_dir}/not_hateful")
             item = [image_name_in_csv, sentence, label]
             split_list.append(item)
     return
@@ -63,23 +65,36 @@ def preprocess_data(src_folder: str, dest_folder: str, train_split: int = 10000,
     try:
         train_data_file = f"{src_folder}/train.jsonl"
         train_data_list = [['image_name', 'sentence', 'label']]
-        if not os.path.exists("./data/training"):
-            os.makedirs("data/training")
-        process_jsonl_to_list(train_data_file, train_data_list, "data/training", src_folder)
+
+        if not os.path.exists("hateful_nothateful/training/hateful"):
+            os.makedirs("hateful_nothateful/training/hateful")
+
+        if not os.path.exists("hateful_nothateful/training/not_hateful"):
+            os.makedirs("hateful_nothateful/training/not_hateful")
+
+        process_jsonl_to_list(train_data_file, train_data_list, "hateful_nothateful/training/", src_folder)
 
         # train data list created
         val_data_file = f"{src_folder}/dev_seen.jsonl"
         validation_data_list = [['image_name', 'sentence', 'label']]
-        if not os.path.exists("./data/validation"):
-            os.makedirs("./data/validation")
-        process_jsonl_to_list(val_data_file, validation_data_list, "data/validation", src_folder)
+        if not os.path.exists("hateful_nothateful/validation/hateful"):
+            os.makedirs("hateful_nothateful/validation/hateful")
+
+        if not os.path.exists("hateful_nothateful/validation/not_hateful"):
+            os.makedirs("hateful_nothateful/validation/not_hateful")
+
+        process_jsonl_to_list(val_data_file, validation_data_list, "hateful_nothateful/validation/", src_folder)
         # validation data list created
 
         test_data_file = f"{src_folder}/dev_unseen.jsonl"
         test_data_list = [['image_name', 'sentence', 'label']]
-        if not os.path.exists("data/testing"):
-            os.makedirs("data/testing")
-        process_jsonl_to_list(test_data_file, test_data_list, "data/testing", src_folder)
+        if not os.path.exists("hateful_nothateful/testing/hateful"):
+            os.makedirs("hateful_nothateful/testing/hateful")
+
+        if not os.path.exists("hateful_nothateful/testing/not_hateful"):
+            os.makedirs("hateful_nothateful/testing/not_hateful")
+
+        process_jsonl_to_list(test_data_file, test_data_list, "hateful_nothateful/testing/", src_folder)
 
         write_list_to_csv(train_data_list, dest_folder, "train_split.csv")
         write_list_to_csv(validation_data_list, dest_folder, "validation_split.csv")
