@@ -32,15 +32,15 @@ dst_help_string = \
     '''
 
 
-def process_jsonl_to_list(file_name: str, split_list):
+def process_jsonl_to_list(file_name: str, split_list, img_dir, src_folder):
     with open(file_name, 'r') as f1:
         for line in f1:
             json_data = json.loads(line)
             image_name = json_data['id']
             sentence = json_data['text']
             label = json_data['label']
-            # shutil.copy(image_name, dst_dir)
             image_name_in_csv = f"{image_name}.png"
+            shutil.copy(f"{src_folder}/img/{image_name_in_csv}", img_dir)
             item = [image_name_in_csv, sentence, label]
             split_list.append(item)
     return
@@ -61,17 +61,23 @@ def preprocess_data(src_folder: str, dest_folder: str, train_split: int = 10000,
     try:
         train_data_file = f"{src_folder}/train.jsonl"
         train_data_list = [['image_name', 'sentence', 'label']]
-        process_jsonl_to_list(train_data_file, train_data_list)
+        if not os.path.exists("data/training"):
+            os.makedirs("data/training")
+        process_jsonl_to_list(train_data_file, train_data_list, "data/training", src_folder)
 
         # train data list created
         val_data_file = f"{src_folder}/dev_seen.jsonl"
         validation_data_list = [['image_name', 'sentence', 'label']]
-        process_jsonl_to_list(val_data_file, validation_data_list)
+        if not os.path.exists("data/validation"):
+            os.makedirs("data/validation")
+        process_jsonl_to_list(val_data_file, validation_data_list, "data/validation", src_folder)
         # validation data list created
 
         test_data_file = f"{src_folder}/dev_unseen.jsonl"
         test_data_list = [['image_name', 'sentence', 'label']]
-        process_jsonl_to_list(test_data_file, test_data_list)
+        if not os.path.exists("data/testing"):
+            os.makedirs("data/testing")
+        process_jsonl_to_list(test_data_file, test_data_list, "data/testing", src_folder)
 
         write_list_to_csv(train_data_list, dest_folder, "train_split.csv")
         write_list_to_csv(validation_data_list, dest_folder, "validation_split.csv")
